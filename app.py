@@ -13,7 +13,7 @@ except Exception:
     st_autorefresh = None
 
 st.set_page_config(
-    page_title="TK EDGE Pro X V1200",
+    page_title="TK EDGE Pro X V1310",
     page_icon="📈",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -55,49 +55,154 @@ h1,h2,h3,p,span,label{color:inherit}
 .nav label{font-weight:1000}
 div.stButton>button{background:#f8fafc!important;color:#111827!important;font-weight:1000!important;border:1px solid #94a3b8!important}
 div.stButton>button *{color:#111827!important}
+div.stButton>button[kind="primary"]{
+  background:#ffd166!important;
+  border-color:#ffd166!important;
+  color:#111827!important;
+}
+div.stButton>button[kind="secondary"]{
+  background:#17202b!important;
+  border-color:#415066!important;
+  color:#ffffff!important;
+}
+div.stButton>button[kind="secondary"] *{color:#ffffff!important}
 @media(max-width:760px){
  .title{font-size:23px}.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
  .card{min-height:72px;padding:8px 5px}.name{font-size:12px}.price{font-size:16px}.change{font-size:15px}
  .hero{grid-template-columns:84px 1fr}.score{width:76px;height:76px;border-width:6px}.score b{font-size:25px}.strategy{font-size:18px}
 }
+
+.tomorrow-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:9px}
+.tomorrow-card{border:1px solid #415066;border-radius:11px;background:#111923;padding:10px;text-align:center}
+.tomorrow-label{font-size:12px;color:#cbd5e1!important}
+.tomorrow-value{font-size:19px;font-weight:1000;margin-top:5px}
+.signal-up{color:#4ade80!important}.signal-down{color:#fb7185!important}.signal-flat{color:#ffd166!important}
+.reason-list{font-size:12px;color:#d4dbe6!important;line-height:1.55;margin-top:8px}
+@media(max-width:760px){.tomorrow-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.tomorrow-value{font-size:16px}}
 </style>
+
 """, unsafe_allow_html=True)
 
 REFRESH_MS = {"1분": 60_000, "5분": 300_000, "10분": 600_000, "30분": 1_800_000}
 
 INDEXES = {
-    "S&P500": "^GSPC", "NASDAQ100": "^NDX", "SOX": "^SOX", "VIX": "^VIX",
-    "미국10년물": "^TNX", "달러지수": "DX-Y.NYB", "USD/KRW": "KRW=X",
-    "KOSPI": "^KS11", "KOSDAQ": "^KQ11", "KOSPI200": "^KS200",
+    "S&P500": "SPY",
+    "NASDAQ100": "QQQ",
+    "DOW": "DIA",
+    "Russell2000": "IWM",
+    "SOX": "SOXX",
+    "VIX": "^VIX",
+    "달러지수": "DX-Y.NYB",
+    "USD/KRW": "KRW=X",
+    "KOSPI": "^KS11",
+    "KOSDAQ": "^KQ11",
 }
 
 CORE_US = {
-    "NVIDIA":"NVDA","Microsoft":"MSFT","Apple":"AAPL","Amazon":"AMZN","Alphabet":"GOOGL",
-    "Meta":"META","Broadcom":"AVGO","Tesla":"TSLA","AMD":"AMD","Micron":"MU",
-    "Vertiv":"VRT","GE Vernova":"GEV","Bloom Energy":"BE","RTX":"RTX","Rocket Lab":"RKLB",
+    "S&P500": "SPY",
+    "NASDAQ100": "QQQ",
+    "AI반도체": "SMH",
+    "반도체": "SOXX",
+    "소형반도체": "XSD",
+    "AI전력": "GRID",
+    "원전": "URA",
+    "방산": "ITA",
+    "우주": "ARKX",
+    "로봇": "BOTZ",
+    "클라우드": "CLOU",
+    "사이버보안": "HACK",
+    "바이오": "IBB",
+    "금융": "XLF",
+    "에너지": "XLE",
+    "자동차": "CARZ",
+    "2차전지": "LIT",
 }
+
 CORE_KR = {
-    "삼성전자":"005930.KS","SK하이닉스":"000660.KS","HD현대일렉트릭":"267260.KS",
-    "두산에너빌리티":"034020.KS","한화에어로":"012450.KS","현대로템":"064350.KS",
-    "현대차":"005380.KS","기아":"000270.KS","삼성바이오":"207940.KS","KB금융":"105560.KS",
+    "KODEX 200": "069500.KS",
+    "KODEX 코스닥150": "229200.KS",
+    "TIGER 미국필반": "381180.KS",
+    "KODEX AI반도체장비": "471990.KS",
+    "KODEX 미국AI전력": "487230.KS",
+    "KODEX AI전력설비": "487240.KS",
+    "PLUS K방산": "436180.KS",
+    "PLUS 우주항공": "421320.KS",
+    "KODEX 은행": "091170.KS",
+    "KODEX 바이오": "244580.KS",
 }
 
 SECTORS = {
-    "AI반도체": {"NVIDIA":"NVDA","AMD":"AMD","Broadcom":"AVGO","TSMC":"TSM","ASML":"ASML","ARM":"ARM","Micron":"MU","SK하이닉스":"000660.KS","삼성전자":"005930.KS"},
-    "메모리": {"Micron":"MU","Sandisk":"SNDK","Western Digital":"WDC","Seagate":"STX","SK하이닉스":"000660.KS","삼성전자":"005930.KS","한미반도체":"042700.KQ","리노공업":"058470.KQ"},
-    "반도체장비": {"ASML":"ASML","Applied Materials":"AMAT","Lam Research":"LRCX","KLA":"KLAC","한미반도체":"042700.KQ","원익IPS":"240810.KQ","주성엔지니어링":"036930.KQ"},
-    "AI전력": {"Vertiv":"VRT","Eaton":"ETN","GE Vernova":"GEV","Constellation":"CEG","Vistra":"VST","Bloom Energy":"BE","HD현대일렉트릭":"267260.KS","LS ELECTRIC":"010120.KS","효성중공업":"298040.KS"},
-    "원전": {"NuScale":"SMR","Oklo":"OKLO","Cameco":"CCJ","Constellation":"CEG","두산에너빌리티":"034020.KS","한전기술":"052690.KS","한전KPS":"051600.KS"},
-    "우주항공": {"Rocket Lab":"RKLB","AST SpaceMobile":"ASTS","Intuitive Machines":"LUNR","Redwire":"RDW","한국항공우주":"047810.KS","한화에어로":"012450.KS"},
-    "방산": {"RTX":"RTX","Lockheed":"LMT","Northrop":"NOC","General Dynamics":"GD","한화에어로":"012450.KS","현대로템":"064350.KS","LIG넥스원":"079550.KS"},
-    "로봇": {"ABB":"ABBNY","Rockwell":"ROK","Symbotic":"SYM","Teradyne":"TER","레인보우로보틱스":"277810.KQ","두산로보틱스":"454910.KS"},
-    "자동차": {"Tesla":"TSLA","Toyota":"TM","Rivian":"RIVN","현대차":"005380.KS","기아":"000270.KS","현대모비스":"012330.KS"},
-    "2차전지": {"Albemarle":"ALB","LG에너지솔루션":"373220.KS","삼성SDI":"006400.KS","포스코퓨처엠":"003670.KS","에코프로비엠":"247540.KQ"},
-    "클라우드": {"Microsoft":"MSFT","Amazon":"AMZN","Alphabet":"GOOGL","Oracle":"ORCL","Snowflake":"SNOW","Cloudflare":"NET","Datadog":"DDOG"},
-    "사이버보안": {"CrowdStrike":"CRWD","Palo Alto":"PANW","Fortinet":"FTNT","Zscaler":"ZS","SentinelOne":"S","Okta":"OKTA"},
-    "바이오": {"Eli Lilly":"LLY","AbbVie":"ABBV","Merck":"MRK","Vertex":"VRTX","삼성바이오":"207940.KS","셀트리온":"068270.KS","알테오젠":"196170.KQ"},
-    "조선": {"HD현대중공업":"329180.KS","HD한국조선해양":"009540.KS","한화오션":"042660.KS","삼성중공업":"010140.KS","HMM":"011200.KS"},
-    "금융": {"JPMorgan":"JPM","Bank of America":"BAC","Goldman Sachs":"GS","Visa":"V","KB금융":"105560.KS","신한지주":"055550.KS","하나금융지주":"086790.KS"},
+    "AI반도체": {
+        "미국 SMH": "SMH",
+        "미국 SOXX": "SOXX",
+        "한국 TIGER 미국필반": "381180.KS",
+    },
+    "반도체 소부장": {
+        "미국 XSD": "XSD",
+        "미국 SOXX": "SOXX",
+        "한국 KODEX AI반도체장비": "471990.KS",
+    },
+    "AI전력·전력인프라": {
+        "미국 GRID": "GRID",
+        "미국 PAVE": "PAVE",
+        "한국 KODEX 미국AI전력": "487230.KS",
+        "한국 KODEX AI전력설비": "487240.KS",
+    },
+    "원전": {
+        "미국 URA": "URA",
+        "미국 NLR": "NLR",
+        "한국 KODEX 미국원자력SMR": "0091H0.KS",
+    },
+    "방산": {
+        "미국 ITA": "ITA",
+        "미국 XAR": "XAR",
+        "한국 PLUS K방산": "436180.KS",
+    },
+    "우주항공": {
+        "미국 ARKX": "ARKX",
+        "미국 UFO": "UFO",
+        "한국 PLUS 우주항공": "421320.KS",
+    },
+    "로봇": {
+        "미국 BOTZ": "BOTZ",
+        "미국 ROBO": "ROBO",
+        "한국 KODEX 로봇액티브": "445290.KS",
+    },
+    "클라우드": {
+        "미국 CLOU": "CLOU",
+        "미국 SKYY": "SKYY",
+        "한국 TIGER 글로벌AI클라우드": "371450.KS",
+    },
+    "사이버보안": {
+        "미국 HACK": "HACK",
+        "미국 CIBR": "CIBR",
+        "한국 TIGER 글로벌사이버보안": "418670.KS",
+    },
+    "바이오": {
+        "미국 IBB": "IBB",
+        "미국 XBI": "XBI",
+        "한국 KODEX 바이오": "244580.KS",
+    },
+    "금융": {
+        "미국 XLF": "XLF",
+        "미국 KRE": "KRE",
+        "한국 KODEX 은행": "091170.KS",
+    },
+    "에너지": {
+        "미국 XLE": "XLE",
+        "미국 XOP": "XOP",
+        "한국 TIGER 200에너지화학": "139250.KS",
+    },
+    "자동차": {
+        "미국 CARZ": "CARZ",
+        "미국 DRIV": "DRIV",
+        "한국 TIGER 현대차그룹": "138540.KS",
+    },
+    "2차전지": {
+        "미국 LIT": "LIT",
+        "미국 BATT": "BATT",
+        "한국 TIGER 2차전지테마": "305540.KS",
+    },
 }
 
 def finite(value):
@@ -285,11 +390,117 @@ def sector_score(data):
     score = max(0,min(100,round(50+avg*8+(up-.5)*40)))
     return int(score), avg, up
 
+
+def etf_rotation_score(data):
+    """당일, 60분, 상승확산을 합친 ETF 섹터 로테이션 점수."""
+    day_vals, m60_vals = [], []
+    for item in data.values():
+        d = finite(item.get("chg"))
+        m = finite(item.get("chg60"))
+        if d is not None:
+            day_vals.append(d)
+        if m is not None:
+            m60_vals.append(m)
+    if not day_vals:
+        return 50, 0.0, 0.0, 0.0
+    day_avg = sum(day_vals) / len(day_vals)
+    m60_avg = sum(m60_vals) / len(m60_vals) if m60_vals else 0.0
+    breadth = sum(1 for v in day_vals if v > 0) / len(day_vals)
+    score = 50 + day_avg * 8 + m60_avg * 6 + (breadth - 0.5) * 35
+    score = int(max(0, min(100, round(score))))
+    return score, day_avg, m60_avg, breadth
+
+def trade_zone(score, m60_avg):
+    """미래 예측이 아닌 현재 신호 강도에 따른 분할매매 참고구간."""
+    if score >= 90 and m60_avg < 0:
+        return "🔴 분할매도 검토"
+    if score >= 82:
+        return "🟢 보유·추세추종"
+    if score >= 68:
+        return "🟡 1차 분할매수 검토"
+    if score >= 55:
+        return "🟠 2차 관찰구간"
+    return "⚪ 대기·추세확인"
+
+def leader_probability(score, day_avg, m60_avg):
+    """다음 주도주 '확률'이 아니라 신호 일치도를 0~99로 표시."""
+    value = 40 + (score - 50) * 0.7 + max(-10, min(10, day_avg * 5)) + max(-10, min(10, m60_avg * 8))
+    return int(max(1, min(99, round(value))))
+
+
+def tomorrow_direction_signal(data):
+    """다음 거래일 방향성 참고 신호.
+
+    미래를 예측하는 확률이 아니라, 현재 ETF·지수 신호의 일치도를 계산합니다.
+    """
+    weights = {
+        "SPY": 1.2,
+        "QQQ": 1.5,
+        "SOXX": 1.6,
+        "^VIX": -1.2,
+        "DX-Y.NYB": -0.8,
+        "KRW=X": -0.9,
+        "^KS11": 1.0,
+        "^KQ11": 0.9,
+    }
+
+    score = 50.0
+    reasons_up, reasons_down = [], []
+
+    for ticker, weight in weights.items():
+        item = data.get(ticker, {})
+        chg = finite(item.get("chg"))
+        m60 = finite(item.get("chg60"))
+        if chg is None:
+            continue
+
+        contribution = max(-8, min(8, chg * 3.0)) * weight
+        if m60 is not None:
+            contribution += max(-4, min(4, m60 * 4.0)) * (0.5 if weight > 0 else -0.5)
+        score += contribution
+
+        name_map = {
+            "SPY":"S&P500", "QQQ":"NASDAQ100", "SOXX":"반도체",
+            "^VIX":"VIX", "DX-Y.NYB":"달러지수", "KRW=X":"원달러",
+            "^KS11":"KOSPI", "^KQ11":"KOSDAQ",
+        }
+        name = name_map.get(ticker, ticker)
+
+        positive = (chg > 0 and weight > 0) or (chg < 0 and weight < 0)
+        reason = f"{name} {chg:+.2f}%"
+        if positive:
+            reasons_up.append(reason)
+        else:
+            reasons_down.append(reason)
+
+    score = int(max(1, min(99, round(score))))
+    if score >= 62:
+        direction = "상승 우세"
+        css = "signal-up"
+    elif score <= 38:
+        direction = "하락 우세"
+        css = "signal-down"
+    else:
+        direction = "혼조·중립"
+        css = "signal-flat"
+
+    confidence = abs(score - 50) * 2
+    confidence = int(max(0, min(98, confidence)))
+
+    return {
+        "score": score,
+        "direction": direction,
+        "css": css,
+        "confidence": confidence,
+        "up_reasons": reasons_up[:4],
+        "down_reasons": reasons_down[:4],
+    }
+
 # Header / navigation
 now_kst, kr_open, us_pre, us_reg, us_after = market_times()
 c1,c2,c3 = st.columns([1.2,1.45,.7])
 with c1:
-    st.markdown("<div class='title'>TK EDGE Pro X <span class='badge'>V1200</span></div>",unsafe_allow_html=True)
+    st.markdown("<div class='title'>TK EDGE Pro X <span class='badge'>V1310</span></div>",unsafe_allow_html=True)
 with c2:
     us_state = "🌅 미국 프리장" if us_pre else ("🟢 미국 정규장" if us_reg else ("🌙 미국 애프터장" if us_after else "⚪ 미국 장마감"))
     kr_state = "🟢 한국 정규장" if kr_open else "⚪ 한국 장마감"
@@ -297,12 +508,50 @@ with c2:
 with c3:
     refresh = st.selectbox("갱신", list(REFRESH_MS), index=2, label_visibility="collapsed")
 if st_autorefresh:
-    st_autorefresh(interval=REFRESH_MS[refresh], key="v1200_refresh")
+    st_autorefresh(interval=REFRESH_MS[refresh], key="v1310_refresh")
 
-page = st.radio("화면", ["🏠 홈","🧩 섹터","📈 피크/순환"], horizontal=True, label_visibility="collapsed")
+# 화면 이동은 셀렉트박스 대신 큰 버튼으로 처리합니다.
+if "page" not in st.session_state:
+    st.session_state.page = "🏠 홈"
+
+nav1, nav2, nav3 = st.columns(3)
+with nav1:
+    if st.button(
+        "🏠 홈",
+        use_container_width=True,
+        type="primary" if st.session_state.page == "🏠 홈" else "secondary",
+        key="nav_home",
+    ):
+        st.session_state.page = "🏠 홈"
+        st.rerun()
+with nav2:
+    if st.button(
+        "🧩 섹터",
+        use_container_width=True,
+        type="primary" if st.session_state.page == "🧩 섹터" else "secondary",
+        key="nav_sector",
+    ):
+        st.session_state.page = "🧩 섹터"
+        st.rerun()
+with nav3:
+    if st.button(
+        "📈 피크/순환",
+        use_container_width=True,
+        type="primary" if st.session_state.page == "📈 피크/순환" else "secondary",
+        key="nav_peak",
+    ):
+        st.session_state.page = "📈 피크/순환"
+        st.rerun()
+
+page = st.session_state.page
 
 if page == "🏠 홈":
-    tickers = list(INDEXES.values()) + list(CORE_US.values()) + list(CORE_KR.values())
+    tickers = list(dict.fromkeys(
+        list(INDEXES.values())
+        + list(CORE_US.values())
+        + list(CORE_KR.values())
+        + ["SPY", "QQQ", "SOXX", "^VIX", "DX-Y.NYB", "KRW=X", "^KS11", "^KQ11"]
+    ))
     with st.spinner("핵심 시장 데이터 불러오는 중..."):
         data = yahoo_prices(tuple(tickers))
         if kis_ready():
@@ -327,6 +576,38 @@ if page == "🏠 홈":
         f"<div><div class='strategy'>오늘 전략: {strategy}</div><div class='small'>핵심 지수의 전일 대비 흐름을 종합한 참고 점수입니다.</div></div></div>",
         unsafe_allow_html=True,
     )
+
+    tomorrow = tomorrow_direction_signal(data)
+    up_reason_text = "<br>".join(f"＋ {reason}" for reason in tomorrow["up_reasons"]) or "＋ 뚜렷한 상승 신호 없음"
+    down_reason_text = "<br>".join(f"－ {reason}" for reason in tomorrow["down_reasons"]) or "－ 뚜렷한 하락 신호 없음"
+
+    st.markdown(
+        f"""
+        <div class='panel'>
+          <div class='panel-title'>🌙 다음 거래일 방향성 참고</div>
+          <div class='tomorrow-grid'>
+            <div class='tomorrow-card'>
+              <div class='tomorrow-label'>방향</div>
+              <div class='tomorrow-value {tomorrow["css"]}'>{tomorrow["direction"]}</div>
+            </div>
+            <div class='tomorrow-card'>
+              <div class='tomorrow-label'>신호 점수</div>
+              <div class='tomorrow-value'>{tomorrow["score"]}점</div>
+            </div>
+            <div class='tomorrow-card'>
+              <div class='tomorrow-label'>신호 일치도</div>
+              <div class='tomorrow-value'>{tomorrow["confidence"]}%</div>
+            </div>
+          </div>
+          <div class='reason-list'>
+            <b class='green'>상승 쪽 근거</b><br>{up_reason_text}<br><br>
+            <b class='red'>하락 쪽 근거</b><br>{down_reason_text}
+          </div>
+          <div class='small'>※ 실제 상승확률이 아니라 S&P500·NASDAQ·SOXX·VIX·달러·환율·한국지수 신호의 방향 일치도입니다.</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     st.markdown("<div class='panel'><div class='panel-title'>🌐 글로벌 지수</div>",unsafe_allow_html=True)
     render_cards(INDEXES,data)
     st.markdown("</div>",unsafe_allow_html=True)
@@ -342,54 +623,114 @@ if page == "🏠 홈":
         st.markdown("</div>",unsafe_allow_html=True)
 
 elif page == "🧩 섹터":
-    selected = st.selectbox("섹터 선택", list(SECTORS.keys()))
+    sector_names = list(SECTORS.keys())
+    if "selected_sector" not in st.session_state:
+        st.session_state.selected_sector = sector_names[0]
+
+    st.markdown("<div class='panel-title'>🧩 ETF 분야를 누르세요</div>", unsafe_allow_html=True)
+    for start in range(0, len(sector_names), 3):
+        cols = st.columns(3)
+        for offset, col in enumerate(cols):
+            idx = start + offset
+            if idx >= len(sector_names):
+                continue
+            sector_name = sector_names[idx]
+            with col:
+                if st.button(
+                    sector_name,
+                    use_container_width=True,
+                    type="primary" if st.session_state.selected_sector == sector_name else "secondary",
+                    key=f"sector_btn_{idx}",
+                ):
+                    st.session_state.selected_sector = sector_name
+                    st.rerun()
+
+    selected = st.session_state.selected_sector
     items = SECTORS[selected]
     tickers = list(items.values())
-    with st.spinner(f"{selected} 데이터 불러오는 중..."):
+    with st.spinner(f"{selected} ETF 데이터 불러오는 중..."):
         data = yahoo_prices(tuple(tickers))
-        kr_tickers = [t for t in tickers if t.endswith((".KS",".KQ"))]
+        kr_tickers = [t for t in tickers if t.endswith((".KS", ".KQ"))]
         if kis_ready() and kr_tickers:
             try:
-                km = kis_prices(tuple(kr_tickers[:10]), st.secrets["KIS_APP_KEY"], st.secrets["KIS_APP_SECRET"])
-                for t,d in km.items():
-                    d["chg60"] = data.get(t,{}).get("chg60")
+                km = kis_prices(tuple(kr_tickers[:6]), st.secrets["KIS_APP_KEY"], st.secrets["KIS_APP_SECRET"])
+                for t, d in km.items():
+                    d["chg60"] = data.get(t, {}).get("chg60")
                     data[t] = d
             except Exception:
                 pass
 
-    score, avg, up = sector_score(data)
-    status = "🔥 강세" if score >= 80 else ("🟢 상승" if score >= 65 else ("🟡 중립" if score >= 50 else "🔴 약세"))
+    score, day_avg, m60_avg, breadth = etf_rotation_score(data)
+    status = "🔥 주도" if score >= 82 else ("🟢 강화" if score >= 68 else ("🟡 중립" if score >= 55 else "🔴 약화"))
+    zone = trade_zone(score, m60_avg)
+    confidence = leader_probability(score, day_avg, m60_avg)
+
     st.markdown(
-        f"<div class='panel hero'><div class='score'><b>{score}</b><span>SECTOR SCORE</span></div>"
-        f"<div><div class='strategy'>{selected} · {status}</div><div class='small'>평균 {avg:+.2f}% · 상승 종목 비율 {up*100:.0f}%</div></div></div>",
+        f"<div class='panel hero'><div class='score'><b>{score}</b><span>ROTATION SCORE</span></div>"
+        f"<div><div class='strategy'>{selected} · {status}</div>"
+        f"<div class='small'>당일 평균 {day_avg:+.2f}% · 60분 {m60_avg:+.2f}% · 상승 ETF {breadth*100:.0f}%</div>"
+        f"<div class='small'>매매 참고: {zone} · 다음 주도 신호 일치도 {confidence}%</div>"
+        f"<div class='small'>내일 섹터 방향 참고: {'상승 우세' if score >= 68 and m60_avg >= 0 else ('하락 주의' if score < 50 or m60_avg < -0.3 else '혼조')}</div></div></div>",
         unsafe_allow_html=True,
     )
-    st.markdown(f"<div class='panel'><div class='panel-title'>🧩 {selected} 대표주</div>",unsafe_allow_html=True)
-    render_cards(items,data)
-    st.markdown("</div>",unsafe_allow_html=True)
-    st.markdown("<div class='notice'>섹터 페이지는 선택한 종목만 조회하므로 전체 종목을 한꺼번에 받을 때보다 빠르고 안정적입니다.</div>",unsafe_allow_html=True)
+    st.markdown(f"<div class='panel'><div class='panel-title'>🇺🇸 미국 ETF + 🇰🇷 한국 ETF</div>", unsafe_allow_html=True)
+    render_cards(items, data)
+    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown(
+        "<div class='notice'>점수와 신호 일치도는 현재 가격·60분 흐름·상승 확산을 계산한 참고지표이며 미래 수익을 보장하지 않습니다.</div>",
+        unsafe_allow_html=True,
+    )
 
 else:
-    # 섹터 순환은 각 섹터 대표 3종목만 조회해 속도 유지
+    # 각 분야의 미국 대표 ETF 1개 + 한국 대표 ETF 1개만 사용해 빠르게 순환 계산
     proxies = {}
     for sec, items in SECTORS.items():
-        proxies[sec] = dict(list(items.items())[:3])
-    all_ticks = [t for items in proxies.values() for t in items.values()]
-    with st.spinner("섹터 순환 계산 중..."):
+        pairs = list(items.items())
+        selected_pairs = []
+        us_added = kr_added = False
+        for name, ticker in pairs:
+            is_kr = ticker.endswith((".KS", ".KQ"))
+            if is_kr and not kr_added:
+                selected_pairs.append((name, ticker))
+                kr_added = True
+            elif not is_kr and not us_added:
+                selected_pairs.append((name, ticker))
+                us_added = True
+            if us_added and kr_added:
+                break
+        proxies[sec] = dict(selected_pairs)
+
+    all_ticks = list(dict.fromkeys(t for items in proxies.values() for t in items.values()))
+    with st.spinner("ETF 자금순환 계산 중..."):
         data = yahoo_prices(tuple(all_ticks))
+        kr_ticks = [t for t in all_ticks if t.endswith((".KS", ".KQ"))]
+        if kis_ready() and kr_ticks:
+            try:
+                km = kis_prices(tuple(kr_ticks[:14]), st.secrets["KIS_APP_KEY"], st.secrets["KIS_APP_SECRET"])
+                for t, d in km.items():
+                    d["chg60"] = data.get(t, {}).get("chg60")
+                    data[t] = d
+            except Exception:
+                pass
+
     rows = []
     for sec, items in proxies.items():
-        subset = {t:data.get(t,{}) for t in items.values()}
-        score, avg, up = sector_score(subset)
-        rows.append((sec,score,avg,up))
-    rows.sort(key=lambda x:x[1],reverse=True)
+        subset = {t: data.get(t, {}) for t in items.values()}
+        score, day_avg, m60_avg, breadth = etf_rotation_score(subset)
+        confidence = leader_probability(score, day_avg, m60_avg)
+        rows.append((sec, score, day_avg, m60_avg, breadth, confidence))
+    rows.sort(key=lambda x: (x[1], x[5]), reverse=True)
 
-    st.markdown("<div class='panel'><div class='panel-title'>📈 섹터 순환 · 피크/피크아웃</div>",unsafe_allow_html=True)
-    for rank,(sec,score,avg,up) in enumerate(rows,1):
-        tag = "🟢 피크 유지" if score >= 80 else ("🟡 피크 근처" if score >= 65 else "🔴 피크아웃 주의")
+    st.markdown("<div class='panel'><div class='panel-title'>💰 ETF 자금순환 · 다음 주도 섹터</div>", unsafe_allow_html=True)
+    for rank, (sec, score, day_avg, m60_avg, breadth, confidence) in enumerate(rows, 1):
+        tag = "🟢 주도 유지" if score >= 82 else ("🟡 강화 중" if score >= 68 else ("⚪ 중립" if score >= 55 else "🔴 약화"))
+        zone = trade_zone(score, m60_avg)
         st.markdown(f"**{rank}. {sec} — {score}점 · {tag}**")
         st.progress(score)
-        st.caption(f"대표 3종목 평균 {avg:+.2f}% · 상승비율 {up*100:.0f}%")
-    st.markdown("</div>",unsafe_allow_html=True)
+        st.caption(
+            f"당일 {day_avg:+.2f}% · 60분 {m60_avg:+.2f}% · 신호 일치도 {confidence}% · {zone}"
+        )
+    st.markdown("</div>", unsafe_allow_html=True)
 
-st.caption(f"Last Update: {now_kst:%Y-%m-%d %H:%M:%S} · V1200 Ultimate Single · 화면별 필요한 데이터만 조회")
+
+st.caption(f"Last Update: {now_kst:%Y-%m-%d %H:%M:%S} · V1310 ETF Rotation · 미국+한국 ETF 기반")
