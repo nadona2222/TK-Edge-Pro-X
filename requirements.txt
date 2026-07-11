@@ -1,5 +1,5 @@
-streamlit
-pandas
-requests
-yfinance
-streamlit-autorefresh
+streamlit==1.45.1
+pandas==2.2.3
+requests==2.32.3
+yfinance==0.2.65
+streamlit-autorefresh==1.0.1
